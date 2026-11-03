@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {QUESTIONS,completedAnswers,validPhone,businessPhone,messageFor,contactLinks,esc} from '../public/core.mjs';
+const answers=Object.fromEntries(QUESTIONS.map(q=>[q.key,q.options[0]]));
+const record={name:'Mauri',company:'Empresa & Cía.',phone:'+595 981 123456',space:'Oficina',interest:'Diagnóstico Verde',message:'Recepción de 20 m².',diagnostic:answers};
+test('el diagnóstico requiere cinco respuestas válidas',()=>{assert.equal(completedAnswers(answers),true);assert.equal(completedAnswers({...answers,light:''}),false);assert.equal(completedAnswers({...answers,size:'inexistente'}),false);});
+test('valida números y normaliza el destino internacional',()=>{assert.equal(validPhone(record.phone),true);assert.equal(validPhone('123'),false);assert.equal(validPhone('abcdef123456'),false);assert.equal(businessPhone('+595 (981) 123-456'),'595981123456');assert.equal(businessPhone('1234567'),'');assert.equal(businessPhone('1'.repeat(16)),'');});
+test('la consulta conserva datos y las cinco respuestas sin prometer diagnóstico gratuito',()=>{const m=messageFor(record);for(const q of QUESTIONS)assert.ok(m.includes(`${q.title} ${answers[q.key]}`));assert.ok(m.includes(record.message));assert.ok(m.includes('costo del diagnóstico'));assert.ok(!m.includes('gratuito'));});
+test('no hay enlaces de envío cuando faltan datos comerciales',()=>{assert.deepEqual(contactLinks({},record),{whatsapp:'',email:''});});
+test('canales codifican los datos y abren el destinatario configurado',()=>{const links=contactLinks({whatsapp:'+595 981 123456',email:'contacto@example.com'},record);const url=new URL(links.whatsapp);assert.equal(url.hostname,'wa.me');assert.equal(url.pathname,'/595981123456');assert.equal(url.searchParams.get('text'),messageFor(record));assert.ok(links.email.startsWith('mailto:contacto%40example.com?'));assert.ok(decodeURIComponent(links.email).includes(record.message));});
+test('el contenido ingresado no se interpreta como HTML',()=>{assert.equal(esc('<img src=x onerror="alert(1)">'), '&lt;img src=x onerror=&quot;alert(1)&quot;&gt;');});

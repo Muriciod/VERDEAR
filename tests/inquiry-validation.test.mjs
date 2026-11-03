@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validateInquiry,csvCell} from '../lib/inquiry-validation.mjs';
+import {QUESTIONS} from '../public/core.mjs';
+const valid={requestKey:'a7b6c5d4-1234-4567-89ab-123456789abc',name:' Cliente ',company:' Empresa ',phone:'0984 206 767',space:'Oficina',interest:'Diagnóstico Verde',message:'Quisiera una propuesta para mi oficina.',consent:true,website:''};
+test('normaliza datos y conserva un teléfono local válido',()=>{const result=validateInquiry(valid);assert.equal(result.name,'Cliente');assert.equal(result.company,'Empresa');assert.equal(result.phone,'0984 206 767');assert.equal(result.diagnostic,null);});
+test('rechaza envíos sin autorización, claves inválidas, spam y cuerpos de otro tipo',()=>{for(const v of [{...valid,consent:false},{...valid,requestKey:'x'},{...valid,website:'https://spam.test'},[],null,{...valid,name:[]}])assert.throws(()=>validateInquiry(v));});
+test('rechaza desbordes y opciones que no pertenecen al formulario',()=>{for(const v of [{...valid,message:'x'.repeat(2001)},{...valid,phone:'hola'},{...valid,space:'Desconocido'},{...valid,interest:'Otro plan inventado'},{...valid,name:'\u0000Nombre'}])assert.throws(()=>validateInquiry(v));});
+test('el diagnóstico requiere todas las respuestas y el mismo espacio que el formulario',()=>{const diagnostic=Object.fromEntries(QUESTIONS.map(q=>[q.key,q.options[0]]));assert.deepEqual(validateInquiry({...valid,diagnostic}).diagnostic,diagnostic);assert.throws(()=>validateInquiry({...valid,diagnostic:{space:'Oficina'}}));assert.throws(()=>validateInquiry({...valid,space:'Comercio',diagnostic}));});
+test('las celdas CSV no ejecutan fórmulas y conservan comillas y saltos',()=>{assert.equal(csvCell('=1+1'),'"\'=1+1"');assert.equal(csvCell('+595123'),'"\'+595123"');assert.equal(csvCell('a"b\nc'),'"a""b\nc"');});
