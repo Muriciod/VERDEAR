@@ -8,7 +8,7 @@ El visitante envía el formulario sin crear una cuenta. El servidor valida los d
 
 La bandeja `/admin` requiere inicio de sesión con ChatGPT y el correo autorizado por `ADMIN_EMAIL`. La autorización se comprueba en cada operación. Incluye búsqueda, filtros, cuestionario, estados, exportación de la página a CSV y eliminación con confirmación. Los enlaces de WhatsApp preparan mensajes que el administrador revisa y envía.
 
-No hay notificaciones automáticas por correo ni WhatsApp. El contacto comercial confirmado es Gaby Duarte, +595 985 240060. No se publica un correo hasta disponer de una dirección real. Compartir la URL no habilita a otros administradores.
+No hay notificaciones automáticas por correo ni WhatsApp. El contacto comercial es verdearrr@gmail.com. Se retiró el paso opcional de envío de la solicitud al WhatsApp comercial. La entrega automática al correo requiere configurar un proveedor de envío; publicar el enlace mailto no activa notificaciones. Compartir la URL no habilita a otros administradores.
 
 ## Contenido
 
