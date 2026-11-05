@@ -8,6 +8,13 @@
       "when": 1793719335615,
       "tag": "0000_secret_maelstrom",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793884580387,
+      "tag": "0001_melted_triton",
+      "breakpoints": true
     }
   ]
 }

@@ -1,3 +1,4 @@
+import {notifyInquiry} from '../../../../lib/notify-inquiry';
 import { json,adminUser,readJson,runtime,sameOrigin } from '../../../../lib/inquiry-server';
 import { STATUSES,UUID } from '../../../../lib/inquiry-validation.mjs';
 export const dynamic='force-dynamic';
@@ -14,7 +15,7 @@ export async function GET(request:Request){
   try{
     const db=runtime().DB;
     const count=await db.prepare('SELECT COUNT(*) AS total FROM inquiries'+where).bind(...params).first<{total:number}>();
-    const rows=await db.prepare('SELECT id, name, company, phone, space, interest, message, diagnostic, status, created_at, updated_at FROM inquiries'+where+' ORDER BY created_at DESC, id DESC LIMIT 25 OFFSET ?').bind(...params,page*25).all();
+    const rows=await db.prepare('SELECT id, name, company, phone, space, interest, message, diagnostic, status, email_status, created_at, updated_at FROM inquiries'+where+' ORDER BY created_at DESC, id DESC LIMIT 25 OFFSET ?').bind(...params,page*25).all();
     return json({items:rows.results,total:count?.total||0,page,pageSize:25});
   }catch{console.error('Admin inbox read failed');return json({error:'No pudimos cargar las solicitudes. Intentá nuevamente.'},503);}
 }
@@ -35,4 +36,13 @@ export async function DELETE(request:Request){
   if(!input||!UUID.test(input.id||''))return json({error:'Datos no válidos.'},400);
   try{const removed=await runtime().DB.prepare('DELETE FROM inquiries WHERE id = ? RETURNING id').bind(input.id).first();return removed?json({ok:true}):json({error:'Solicitud no encontrada.'},404);}
   catch{console.error('Admin inquiry deletion failed');return json({error:'No se pudo eliminar la solicitud.'},503);}
+}
+
+export async function POST(request:Request){
+  if(!await adminUser())return json({error:'Acceso restringido.'},403);
+  if(!sameOrigin(request))return json({error:'Origen no permitido.'},403);
+  let input;try{input=await readJson(request,1000);}catch{return json({error:'Datos no válidos.'},400);}
+  if(!input||!UUID.test(input.id||''))return json({error:'Datos no válidos.'},400);
+  try{const result=await notifyInquiry(input.id,new URL(request.url).origin);return json({emailStatus:result},result==='accepted'?200:503);}
+  catch{return json({error:'No pudimos enviar el aviso.'},503);}
 }

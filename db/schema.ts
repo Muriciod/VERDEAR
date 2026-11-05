@@ -14,6 +14,8 @@ export const inquiries = sqliteTable('inquiries', {
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
   consentAt: text('consent_at').notNull(),
+  emailStatus: text('email_status').notNull().default('pending'),
+  emailAttemptedAt: text('email_attempted_at'),
 }, t => [uniqueIndex('inquiries_request_key_unique').on(t.requestKey), index('inquiries_created_idx').on(t.createdAt), index('inquiries_status_idx').on(t.status)]);
 
 export const submissionLimits = sqliteTable('submission_limits', {

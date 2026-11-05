@@ -8,7 +8,7 @@ El visitante envía el formulario sin crear una cuenta. El servidor valida los d
 
 La bandeja `/admin` requiere inicio de sesión con ChatGPT y el correo autorizado por `ADMIN_EMAIL`. La autorización se comprueba en cada operación. Incluye búsqueda, filtros, cuestionario, estados, exportación de la página a CSV y eliminación con confirmación. Los enlaces de WhatsApp preparan mensajes que el administrador revisa y envía.
 
-No hay notificaciones automáticas por correo ni WhatsApp. El contacto comercial es verdearrr@gmail.com. Se retiró el paso opcional de envío de la solicitud al WhatsApp comercial. La entrega automática al correo requiere configurar un proveedor de envío; publicar el enlace mailto no activa notificaciones. Compartir la URL no habilita a otros administradores.
+Cada solicitud nueva se guarda y genera un aviso por correo mediante FormSubmit. El contacto comercial es verdearrr@gmail.com. Se retiró el paso opcional de envío de la solicitud al WhatsApp comercial. El destino fijo es verdearrr@gmail.com. Activar EMAIL_NOTIFICATIONS_ENABLED=true en producción. FormSubmit envía una activación inicial al destinatario, que debe pulsar el enlace para habilitar la recepción. No se usa ni almacena la contraseña de Gmail. El proveedor acepta el aviso, pero esto no garantiza llegada a la bandeja principal: revisar spam. Compartir la URL no habilita a otros administradores.
 
 ## Contenido
 
@@ -38,3 +38,9 @@ El formulario exige consentimiento, valida los campos y tamaños, rechaza oríge
 - Prueba en navegador del formulario hasta la confirmación guardada en la base local.
 
 Compilar antes de ejecutar la integración. Las migraciones no contienen registros de ejemplo.
+
+## Entrega de avisos
+
+La migración 0001 agrega estado de notificación y fecha de intento. El envío es del servidor a FormSubmit; solo se marca aceptado si responde con éxito. Las solicitudes guardadas no se pierden ante fallos de correo: el visitante puede reintentar el mismo envío y el administrador puede reintentar avisos pendientes desde /admin. Una reserva temporal evita envíos concurrentes duplicados. No hay garantía de entrega exactamente una vez si el proveedor acepta el mensaje pero la conexión se corta antes de confirmar. No hay proceso de reintentos en segundo plano. La eliminación de una consulta en VERDEAR no borra copias ya enviadas al buzón o al proveedor.
+
+Las pruebas locales no envían mensajes reales: el indicador de envío está desactivado y las pruebas unitarias usan un proveedor simulado.

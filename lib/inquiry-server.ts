@@ -1,7 +1,7 @@
 import { env } from 'cloudflare:workers';
 import { getChatGPTUser } from '../app/chatgpt-auth';
 
-export const runtime = () => env as unknown as {DB:D1Database;ADMIN_EMAIL?:string;RATE_LIMIT_SALT?:string};
+export const runtime = () => env as unknown as {DB:D1Database;ADMIN_EMAIL?:string;RATE_LIMIT_SALT?:string;EMAIL_NOTIFICATIONS_ENABLED?:string};
 export function json(data:unknown,status=200){return new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});}
 export function sameOrigin(request:Request){return request.headers.get('origin')===new URL(request.url).origin;}
 export async function adminUser(){
