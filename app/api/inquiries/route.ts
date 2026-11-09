@@ -8,8 +8,10 @@ export async function POST(request:Request){
   const {DB,RATE_LIMIT_SALT}=runtime();
   if(!DB||!RATE_LIMIT_SALT)return json({error:'El formulario no está disponible. Contactanos a verdearrr@gmail.com.'},503);
   async function receipt(id:string,status:number){
-    const emailStatus=await notifyInquiry(id,new URL(request.url).origin);
-    if(emailStatus==='failed'||emailStatus==='sending')return json({error:'Tu solicitud está guardada, pero el aviso por correo sigue pendiente. Volvé a presionar Enviar solicitud para reintentar sin duplicarla.'},503);
+    // A persisted inquiry is received even when its email notification needs retrying.
+    let emailStatus='pending';
+    try{emailStatus=await notifyInquiry(id,new URL(request.url).origin);}
+    catch{console.error('Saved inquiry notification remains pending');}
     return json({id,reference:'VRD-'+id.slice(0,12).toUpperCase(),emailStatus},status);
   }
   try{
