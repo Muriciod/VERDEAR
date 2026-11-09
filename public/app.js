@@ -24,7 +24,7 @@ function home(){return `<section class="hero"><div class="hero-copy"><p class="e
 <section class="section"><div class="section-top"><h2>Servicios</h2><a href="#servicios">Explorar todos los servicios →</a></div>${serviceCards(SERVICES.slice(0,3))}</section>
 <section class="section"><h2>Cómo trabajamos</h2>${steps()}</section>
 <section class="section"><div class="grid two"><div><p class="eyebrow">Diagnóstico Verde</p><h2>Antes del diseño, entendemos el espacio.</h2><p>Consideramos iluminación, dimensiones, circulación, estilo corporativo y necesidades de mantenimiento.</p><small>La cobertura, el alcance y el costo se confirman al coordinar el diagnóstico.</small></div><div><h2>¿Por qué VERDEAR?</h2><ul><li>Diseño adaptado al espacio.</li><li>Selección vegetal según condiciones ambientales.</li><li>Instalación coordinada.</li><li>Alternativas de mantenimiento.</li><li>Atención personalizada.</li></ul></div></div></section>
-<section class="section"><div class="section-top"><h2>Ideas para transformar espacios</h2><a href="#proyectos">Ver propuestas conceptuales →</a></div><p class="muted">Explorá propuestas conceptuales para imaginar las posibilidades de tu espacio.</p></section>
+<section class="section"><div class="section-top"><h2>Ideas para transformar espacios</h2><a href="#proyectos">Ver propuestas conceptuales →</a></div><p class="muted">Explorá propuestas conceptuales para imaginar las posibilidades de tu espacio.</p><div class="project-teaser"><a href="#proyectos"><img src="./assets/botanical-lounge.webp" alt="Salón vegetal conceptual generado con IA" loading="lazy" width="1536" height="1024"><span>Espacios que se sienten diferentes ↗</span></a><a href="#proyectos"><img src="./assets/plantas-interior.webp" alt="Composición de plantas ilustrativa generada con IA" loading="lazy" width="1536" height="1024"><span>La naturaleza está en los detalles ↗</span></a></div></section>
 <section class="section"><div class="section-top"><h2>Planes y soluciones</h2><a href="#planes">Comparar opciones →</a></div>${planCards()}</section>
 <section class="section"><h2>Contanos qué querés transformar.</h2><p>Podés comenzar con el cuestionario o describir directamente tu proyecto.</p><a class="button primary" href="#contacto">Hacer una consulta</a></section>`;}
 function serviceProcess(){
@@ -118,7 +118,18 @@ var revealObserver;
 function animatePage(){
   revealObserver?.disconnect();
   main.classList.remove('enter');void main.offsetWidth;main.classList.add('enter');
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window))return;
+  if(document.body.classList.contains('motion-paused')||matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window))return;
   revealObserver=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('reveal-in');revealObserver.unobserve(e.target);}}),{threshold:.12});
   main.querySelectorAll('.section,.service-process').forEach(el=>revealObserver.observe(el));
 }
+
+const motionButton=document.querySelector('.motion-control');
+const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
+function setMotion(paused){document.body.classList.toggle('motion-paused',paused);motionButton.setAttribute('aria-pressed',String(paused));motionButton.textContent=paused?'Activar movimiento':'Pausar movimiento';}
+setMotion(reducedMotion.matches);
+motionButton.addEventListener('click',()=>setMotion(!document.body.classList.contains('motion-paused')));
+reducedMotion.addEventListener('change',e=>setMotion(e.matches));
+let scrollTick=false;
+function updateScrollMeter(){const range=document.documentElement.scrollHeight-innerHeight;document.querySelector('.scroll-meter').style.transform='scaleX('+Math.max(0,Math.min(1,range>0?scrollY/range:0))+')';scrollTick=false;}
+addEventListener('scroll',()=>{if(!scrollTick){scrollTick=true;requestAnimationFrame(updateScrollMeter);}},{passive:true});
+addEventListener('resize',updateScrollMeter);addEventListener('hashchange',()=>requestAnimationFrame(updateScrollMeter));updateScrollMeter();
