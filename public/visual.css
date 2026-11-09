@@ -15,3 +15,5 @@ header .brand{display:block;position:relative;width:160px;height:136px;flex:0 0 
 header .brand:before,header .brand:after{display:none;content:none}
 header .brand .brand-logo{position:absolute;max-width:none;width:200px;height:200px;left:-20px;top:-24px;object-fit:contain}
 @media(max-width:600px){header .brand{width:128px;height:109px;flex-basis:128px}header .brand .brand-logo{width:160px;height:160px;left:-16px;top:-19px}}
+
+header .brand{display:flex;align-items:center;gap:12px;background:transparent;width:auto;height:auto;flex:0 0 auto;overflow:visible;border-radius:0}header .brand .brand-logo{position:static;width:64px;height:64px;object-fit:contain}header .brand .brand-wordmark{font-size:23px;letter-spacing:.14em;line-height:1.2;color:#f4f4dc}header .brand small{display:block;font-size:7px;letter-spacing:.08em;margin-top:7px} @media(max-width:600px){header .brand .brand-logo{width:48px;height:48px}header .brand .brand-wordmark{font-size:19px}}
